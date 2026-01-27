@@ -19,7 +19,7 @@
       <ul class="nav-links">
         <li><a href="#container">Home</a></li>
         <li><a href="#aboutcontainer">About</a></li>
-        <li><a href="#courses">Courses</a></li>
+        <li><a href="http://localhost/bCA-Project-II/courses/courses.php">Courses</a></li>
         <li><a href="#footer">Contact Us</a></li>
       </ul>
       <!-- search bar -->
@@ -48,7 +48,7 @@
         <p>Anywhere, Anytime, Start learning today!</p>
         
 
-        <a href="#" class="get-started">Get Started</a>
+        <a href="http://localhost/BCA-Project-II/webpage/login.php" class="get-started">Get Started</a>
       </div>
 
       <!-- right side -->

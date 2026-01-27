@@ -39,12 +39,12 @@ $result = mysqli_query($conn, $sql);
 					<img src="images\logo1.png" alt="Logo">
 				</a>
 				<ul class="nav-list">
-					<li><a href="">Home</a></li>
-					<li><a href="">About Us</a></li>
-					<li><a href="">Courses</a></li>
-					<li><a href="">Contact Us</a></li>
+					<li><a href="http://localhost/BCA-Project-II/webpage/webpage.php">Home</a></li>
+					<li><a href="http://localhost/BCA-Project-II/webpage/webpage.php">About Us</a></li>
+					<li><a href="http://localhost/BCA-Project-II/webpage/webpage.php">Courses</a></li>
+					<li><a href="http://localhost/BCA-Project-II/webpage/webpage.php">Contact Us</a></li>
 				</ul>
-				<a href="#" class="get-started-btn-container">
+				<a href="http://localhost/bca-Project-II/webpage/login.php" class="get-started-btn-container">
 					<button class="get-started-btn btn">Get Started</button>
 				</a>
 				<div class="menu-btn">
@@ -91,9 +91,6 @@ $result = mysqli_query($conn, $sql);
 								echo '<div class="course-card">';
 								echo '<img src="images/courses/course-1.jpg">';
 								echo '<div class="category">';
-								echo '<div class="subject">';
-								echo '<h3>' . $items['category'] . '</h3>';
-								echo '</div>';
 								echo '</div>';
 
 								echo '<h2 class="course-title">' . $items['title'] . '</h2>';
@@ -115,9 +112,9 @@ $result = mysqli_query($conn, $sql);
 							echo '<div class="course-card">';
 							echo '<img src="images/courses/course-1.jpg">';
 							echo '<div class="category">';
-							echo '<div class="subject">';
-							echo '<h3>' . $row['category'] . '</h3>';
-							echo '</div>';
+							// echo '<div class="subject">';
+							// echo '<h3>' . $row['category'] . '</h3>';
+							// echo '</div>';
 							echo '</div>';
 
 							echo '<h2 class="course-title">' . $row['title'] . '</h2>';
