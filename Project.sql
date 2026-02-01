@@ -22,12 +22,24 @@ password varchar(100)
 );
 select * from learnerlogin;
 
+-- learner interest
 create table learnerinterests(
 learnerinterest_id int primary key auto_increment,
-learner_id int,
-interests varchar(20),
+learner_id int not null,
+interests varchar(50),
 foreign key(learner_id) references learnerlogin(learner_id)
 );
+SHOW CREATE TABLE learnerinterests;
+ALTER TABLE learnerinterests
+DROP FOREIGN KEY learnerinterests_ibfk_1;
+ALTER TABLE learnerinterests
+ADD CONSTRAINT fk_learner FOREIGN KEY (learner_id) REFERENCES learnerlogin(learner_id) ON DELETE CASCADE;
+
+select * from learnerinterests;
+SELECT l.learner_id,l.firstname,l.lastname,l.email,
+GROUP_CONCAT(i.interests ORDER BY i.interests SEPARATOR ', ') AS interests
+FROM learnerlogin l LEFT JOIN learnerinterests i ON l.learner_id = i.learner_id
+GROUP BY l.learner_id, l.firstname, l.lastname, l.email;
 
 -- for admin login
 create table admin(
