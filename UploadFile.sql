@@ -26,6 +26,7 @@ main_description varchar(1000),
 learning_outcomes varchar(500),
 course_content varchar(500)
 );
+select * from courses_info;
 
  insert into courses_info(id,title,main_description,learning_outcomes,course_content)
  values(1,'Introduction to Php','Learn how to dynamically generate html lists using php and data fetched from sql.', 'Understand sql data structure; Use php explode() function; Generate dynamic 

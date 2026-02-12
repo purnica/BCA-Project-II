@@ -3,14 +3,21 @@ create database project6;
 create table course (
 id int primary key auto_increment,
 category varchar(50),
-duration varchar(10),
 title varchar(100),
 primary_description varchar(1000),
 learning_outcomes varchar(500),
 image varchar(255)
 );
-
 select * from course;
+
+create table course_content(
+content_id int primary key auto_increment,
+course_id int,
+content_title varchar(100),
+filepath varchar(255),
+foreign key(course_id) references course(id)
+);
+select * from course_content;
 
 -- learners login
 create table learnerlogin(

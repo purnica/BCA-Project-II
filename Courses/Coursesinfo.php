@@ -1,5 +1,16 @@
 <?php
-include('C:\xampp\htdocs\BCA-Project-II\db.php');
+$servername = "localhost";
+$username = "root";
+$pass = "Mysql@123";
+$dbname = "file";
+
+// Create connection
+$conn = new mysqli($servername, $username, $pass, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 $sql = "SELECT * FROM courses_info";
 $result = mysqli_query($conn, $sql);

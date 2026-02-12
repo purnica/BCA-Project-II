@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Course</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: #f0f4f8;
+            padding: 20px;
+        }
+
+        .topbar {
+            background: #1a5490; color: white; padding: 0 32px;
+            height: 60px; display: flex; align-items: center; justify-content: space-between;
+            border-radius: 8px 8px 0 0; margin-bottom: 0;
+        }
+        .topbar h1 { font-size: 20px; font-weight: 600; }
+        .btn-list { background: rgba(255,255,255,0.2); color: white; padding: 9px 20px;
+                    border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 600; }
+        .btn-list:hover { background: rgba(255,255,255,0.35); }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 36px 40px;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .page-title {
+            color: #1a5490;
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 28px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .form-group { margin-bottom: 22px; }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 7px;
+            color: #4a5568;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: white;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #5cb3cc;
+            box-shadow: 0 0 0 3px rgba(92, 179, 204, 0.15);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 110px;
+        }
+
+        .char-count {
+            font-size: 11px;
+            color: #718096;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        /* ── Dynamic containers ─────────────────────────── */
+        .dynamic-container {
+            background-color: #f7fafc;
+            padding: 18px 20px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .learning-outcome-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .learning-outcome-item input { flex: 1; }
+
+        .content-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 10px;
+            align-items: start;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .content-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+        /* ── Buttons ────────────────────────────────────── */
+        .btn-remove {
+            background: #fff5f5;
+            color: #c53030;
+            border: 1px solid #fed7d7;
+            padding: 10px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: background 0.15s;
+        }
+        .btn-remove:hover { background: #fed7d7; }
+
+        .btn-add {
+            background: #f0fff4;
+            color: #276749;
+            border: 1px solid #c6f6d5;
+            padding: 10px 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 12px;
+            transition: background 0.15s;
+        }
+        .btn-add:hover { background: #c6f6d5; }
+
+        .btn-submit {
+            background-color: #1a5490;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            width: 100%;
+            margin-top: 24px;
+            transition: background 0.2s;
+            letter-spacing: 0.3px;
+        }
+        .btn-submit:hover { background-color: #144073; }
+
+        .note {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 5px;
+            margin-bottom: 12px;
+        }
+
+        /* ── Image preview ──────────────────────────────── */
+        .image-preview {
+            margin-top: 12px;
+            max-width: 400px;
+            display: none;
+        }
+        .image-preview img {
+            max-width: 100%;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* ── Section divider ────────────────────────────── */
+        .section-label {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1a5490;
+            margin-bottom: 16px;
+            margin-top: 32px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .section-label:first-child { margin-top: 0; }
+    </style>
+</head>
+<body>
+
+    <div style="max-width: 860px; margin: 0 auto;">
+        <div class="topbar">
+            <h1>📚 Add New Course</h1>
+            <a href="adminList.php" class="btn-list">View All Courses →</a>
+        </div>
+    </div>
+
+    <div class="container" style="max-width: 860px; margin: 0 auto;">
+
+        <form id="courseForm" method="POST" enctype="multipart/form-data" action="adminCreate.php">
+
+            <!-- Hidden field: populated by JS before submit -->
+            <input type="hidden" name="learning_outcomes" id="learning_outcomes_hidden">
+
+            <div class="section-label">Course Information</div>
+
+            <!-- Category -->
+            <div class="form-group">
+                <label for="category">Category *</label>
+                <select id="category" name="category" required>
+                    <option value="">Select a category</option>
+                    <option value="Programming">Programming</option>
+                    <option value="Web Development">Web Development</option>
+                    <option value="Data Science">Data Science</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <!-- Title -->
+            <div class="form-group">
+                <label for="title">Course Title *</label>
+                <input type="text" id="title" name="title" maxlength="100" required
+                       placeholder="e.g., PHP Introduction">
+                <div class="char-count"><span id="titleCount">0</span>/100 characters</div>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+                <label for="primary_description">Primary Description *</label>
+                <textarea id="primary_description" name="primary_description" maxlength="1000" required
+                          placeholder="Describe what this course is about..."></textarea>
+                <div class="char-count"><span id="descCount">0</span>/1000 characters</div>
+            </div>
+
+            <!-- Learning Outcomes -->
+            <div class="form-group">
+                <label>Learning Outcomes *</label>
+                <div class="dynamic-container">
+                    <div id="learningOutcomes">
+                        <div class="learning-outcome-item">
+                            <input type="text" class="outcome-input" placeholder="e.g., Understand PHP syntax" required>
+                            <button type="button" class="btn-remove" onclick="removeOutcome(this)">Remove</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-add" onclick="addOutcome()">+ Add Learning Outcome</button>
+                </div>
+                <div class="char-count"><span id="outcomesCount">0</span>/500 characters</div>
+            </div>
+
+            <div class="section-label">Chapters &amp; Content</div>
+
+            <!-- Chapters -->
+            <div class="form-group">
+                <p class="note">Each chapter requires a title and one content file (image, video, or PDF).</p>
+                <div class="dynamic-container">
+                    <div id="courseContents">
+                        <div class="content-item">
+                            <div>
+                                <label>Chapter Title *</label>
+                                <input type="text" name="chapter_titles[]"
+                                       placeholder="e.g., Introduction to PHP" required>
+                            </div>
+                            <div>
+                                <label>Content File *</label>
+                                <input type="file" name="chapter_files[]" required>
+                            </div>
+                            <button type="button" class="btn-remove" onclick="removeContent(this)"
+                                    style="margin-top: 26px;">✕</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-add" onclick="addContent()">+ Add New Chapter</button>
+                </div>
+            </div>
+
+            <div class="section-label">Course Thumbnail</div>
+
+            <!-- Thumbnail -->
+            <div class="form-group">
+                <label for="image">Thumbnail Image (optional)</label>
+                <input type="file" id="image" name="image" accept="image/*" onchange="previewImage(this)">
+                <div class="image-preview" id="imagePreview">
+                    <img id="previewImg" src="" alt="Preview">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">✓ Submit Course</button>
+        </form>
+    </div>
+
+    <script>
+        // ── Character counters ──────────────────────────────────
+        function setupCounter(inputId, countId, max) {
+            const el = document.getElementById(inputId);
+            const ct = document.getElementById(countId);
+            if (!el || !ct) return;
+            el.addEventListener('input', function () {
+                ct.textContent = this.value.length;
+                ct.style.color = this.value.length >= max ? '#c53030' : '#718096';
+            });
+        }
+        setupCounter('title',               'titleCount',    100);
+        setupCounter('primary_description', 'descCount',    1000);
+
+        // ── Learning outcomes ───────────────────────────────────
+        function addOutcome() {
+            const container = document.getElementById('learningOutcomes');
+            const div = document.createElement('div');
+            div.className = 'learning-outcome-item';
+            div.innerHTML = `
+                <input type="text" class="outcome-input" placeholder="e.g., Next Outcome" required>
+                <button type="button" class="btn-remove" onclick="removeOutcome(this)">Remove</button>
+            `;
+            container.appendChild(div);
+            updateOutcomesCount();
+        }
+
+        function removeOutcome(button) {
+            const container = document.getElementById('learningOutcomes');
+            if (container.children.length > 1) {
+                button.parentElement.remove();
+                updateOutcomesCount();
+            } else {
+                alert('At least one learning outcome is required.');
+            }
+        }
+
+        function updateOutcomesCount() {
+            const total = [...document.querySelectorAll('.outcome-input')]
+                .reduce((sum, el) => sum + el.value.length, 0);
+            const ct = document.getElementById('outcomesCount');
+            ct.textContent = total;
+            ct.style.color = total > 500 ? '#c53030' : '#718096';
+        }
+        document.addEventListener('input', e => {
+            if (e.target.classList.contains('outcome-input')) updateOutcomesCount();
+        });
+
+        // ── Course chapters ─────────────────────────────────────
+        function addContent() {
+            const container = document.getElementById('courseContents');
+            const div = document.createElement('div');
+            div.className = 'content-item';
+            div.innerHTML = `
+                <div>
+                    <label>Chapter Title *</label>
+                    <input type="text" name="chapter_titles[]" placeholder="e.g., Chapter Title" required>
+                </div>
+                <div>
+                    <label>Content File *</label>
+                    <input type="file" name="chapter_files[]" required>
+                </div>
+                <button type="button" class="btn-remove" onclick="removeContent(this)"
+                        style="margin-top: 26px;">✕</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeContent(button) {
+            const container = document.getElementById('courseContents');
+            if (container.children.length > 1) {
+                button.parentElement.remove();
+            } else {
+                alert('A course must have at least one chapter.');
+            }
+        }
+
+        // ── Thumbnail preview ───────────────────────────────────
+        function previewImage(input) {
+            const preview = document.getElementById('imagePreview');
+            const img     = document.getElementById('previewImg');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => { img.src = e.target.result; preview.style.display = 'block'; };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // ── Form submit: inject outcomes into hidden field ──────
+        document.getElementById('courseForm').addEventListener('submit', function (e) {
+            const outcomes = [...document.querySelectorAll('.outcome-input')]
+                .map(el => el.value.trim())
+                .filter(Boolean)
+                .join(', ');
+
+            if (!outcomes) {
+                e.preventDefault();
+                alert('Please add at least one learning outcome.');
+                return;
+            }
+            if (outcomes.length > 500) {
+                e.preventDefault();
+                alert('Learning outcomes text exceeds 500 characters. Please shorten them.');
+                return;
+            }
+
+            // Set the hidden field so PHP receives `learning_outcomes`
+            document.getElementById('learning_outcomes_hidden').value = outcomes;
+            // The form now submits naturally to adminCreate.php
+        });
+    </script>
+</body>
+</html>

@@ -142,7 +142,7 @@ $name = $_SESSION['name'];
 
       <nav class="navbar">
          <a href="admindashboard.php"><i class="fas fa-home"></i><span>Dashboard</span></a>
-         <a href="CRUD.php"><i class="fas fa-graduation-cap"></i><span>courses</span></a>
+         <a href="http://localhost/bCA-Project-II/admin/adminList.php"><i class="fas fa-graduation-cap"></i><span>courses</span></a>
          <a href="learner-info.php"><i class="fas fa-chalkboard-user"></i><span>Learner-Info</span></a>
       </nav>
 

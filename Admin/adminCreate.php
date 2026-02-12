@@ -1,197 +1,160 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "Mysql@123";
-$dbname = "project";
+// ============================================================
+// adminCreate.php — CREATE: Insert a new course + its chapters
+// ============================================================
+// Accepts: POST multipart/form-data from the course HTML form.
+// On success: redirects to adminList.php with a success flash.
+// On error:   redirects back with an error flash.
+// ============================================================
 
-$conn = mysqli_connect($servername, $username, $password, $dbname);
+require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/upload_helper.php';
 
-// Check connection
-if(!$conn)
-{
-   die ("connection failed" . mysqli_connect_error());
+// Only accept POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: adminList.php');
+    exit;
 }
 
-// Handle Create Operation
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create'])) {
-    $title = $_POST['title'];
-    $description = $_POST['description'];
-    $credithour = $_POST['credithour'];
-    $admin = $_POST['admin'];
+// ── Helper: redirect with a flash message stored in session ──
+session_start();
+function redirectWithFlash(string $url, string $type, string $msg): never {
+    $_SESSION['flash'] = ['type' => $type, 'message' => $msg];
+    header('Location: ' . $url);
+    exit;
+}
 
-    $sql = "INSERT INTO courses (CourseTitle, description, CreditHour, admin) VALUES ('$title', '$description',$credithour, $admin)";
-    $result = mysqli_query($conn,$sql);  
+// ── 1. Collect & validate course-level fields ─────────────────
+$category            = trim($_POST['category']            ?? '');
+$title               = trim($_POST['title']               ?? '');
+$primary_description = trim($_POST['primary_description'] ?? '');
+$learning_outcomes   = trim($_POST['learning_outcomes']   ?? ''); // already joined by JS
 
-    if ($result) {
-         echo '<script type="text/javascript">';
-         echo 'alert("New course created successfully!");';
-         echo 'window.location.href = "CRUD.php"';
-         echo '</script>';
-      } 
-      else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
+$errors = [];
+
+if (empty($category))            $errors[] = 'Category is required.';
+if (empty($title))               $errors[] = 'Title is required.';
+if (empty($primary_description)) $errors[] = 'Primary description is required.';
+if (empty($learning_outcomes))   $errors[] = 'At least one learning outcome is required.';
+
+if (strlen($category)            > 50)   $errors[] = 'Category must be ≤ 50 characters.';
+if (strlen($title)               > 100)  $errors[] = 'Title must be ≤ 100 characters.';
+if (strlen($primary_description) > 1000) $errors[] = 'Description must be ≤ 1000 characters.';
+if (strlen($learning_outcomes)   > 500)  $errors[] = 'Learning outcomes must be ≤ 500 characters.';
+
+// ── 2. Validate chapters ──────────────────────────────────────
+$chapterTitles = $_POST['chapter_titles'] ?? [];
+$chapterFiles  = $_FILES['chapter_files'] ?? [];
+
+// Re-index the chapter_files array so we can iterate like a normal array
+$chaptersCount = count($chapterTitles);
+
+if ($chaptersCount === 0) {
+    $errors[] = 'At least one chapter is required.';
+} else {
+    for ($i = 0; $i < $chaptersCount; $i++) {
+        $ct = trim($chapterTitles[$i] ?? '');
+        if (empty($ct)) {
+            $errors[] = "Chapter " . ($i + 1) . ": title is required.";
+        } elseif (strlen($ct) > 100) {
+            $errors[] = "Chapter " . ($i + 1) . ": title must be ≤ 100 characters.";
+        }
+
+        if (!isset($chapterFiles['error'][$i]) || $chapterFiles['error'][$i] !== UPLOAD_ERR_OK) {
+            $errors[] = "Chapter " . ($i + 1) . ": a content file is required.";
+        }
     }
 }
-?>
 
-<?php
-session_start();
-// Check if user is logged in
-if (!isset($_SESSION['name']) && !isset($_SESSION['adminid'])) {
-   header("Location: admindasboard.php");
-   exit;
+if (!empty($errors)) {
+    redirectWithFlash('index.html', 'error', implode(' | ', $errors));
 }
-$name = $_SESSION['name'];
-$adminid = $_SESSION['adminid'];
+
+// ── 3. Upload course thumbnail (optional) ────────────────────
+global $ALLOWED_IMAGE_TYPES;
+$imagePath = '';
+
+if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+    try {
+        $imagePath = uploadFile(
+            $_FILES['image'],
+            UPLOAD_THUMBNAIL_DIR,
+            UPLOAD_THUMBNAIL_URL,
+            $ALLOWED_IMAGE_TYPES
+        );
+    } catch (RuntimeException $e) {
+        redirectWithFlash('index.html', 'error', 'Thumbnail upload failed: ' . $e->getMessage());
+    }
+}
+
+// ── 4. Start DB transaction & insert ─────────────────────────
+$pdo = getConnection();
+
+try {
+    $pdo->beginTransaction();
+
+    // Insert into course table
+    $stmt = $pdo->prepare("
+        INSERT INTO course (category, title, primary_description, learning_outcomes, image)
+        VALUES (:category, :title, :primary_description, :learning_outcomes, :image)
+    ");
+    $stmt->execute([
+        ':category'            => $category,
+        ':title'               => $title,
+        ':primary_description' => $primary_description,
+        ':learning_outcomes'   => $learning_outcomes,
+        ':image'               => $imagePath,
+    ]);
+
+    $courseId = (int) $pdo->lastInsertId();
+
+    // Insert each chapter into course_content
+    $chapterStmt = $pdo->prepare("
+        INSERT INTO course_content (course_id, content_title, filepath)
+        VALUES (:course_id, :content_title, :filepath)
+    ");
+
+    global $ALLOWED_CONTENT_TYPES;
+
+    for ($i = 0; $i < $chaptersCount; $i++) {
+        $contentTitle = trim($chapterTitles[$i]);
+
+        // Build a single-file array from the multi-file $_FILES structure
+        $singleFile = [
+            'name'     => $chapterFiles['name'][$i],
+            'type'     => $chapterFiles['type'][$i],
+            'tmp_name' => $chapterFiles['tmp_name'][$i],
+            'error'    => $chapterFiles['error'][$i],
+            'size'     => $chapterFiles['size'][$i],
+        ];
+
+        try {
+            $filePath = uploadFile(
+                $singleFile,
+                UPLOAD_CONTENT_DIR,
+                UPLOAD_CONTENT_URL,
+                $ALLOWED_CONTENT_TYPES
+            );
+        } catch (RuntimeException $e) {
+            $pdo->rollBack();
+            // Clean up already-uploaded thumbnail
+            deleteFile($imagePath);
+            redirectWithFlash('index.html', 'error', 'Chapter ' . ($i + 1) . ' file upload failed: ' . $e->getMessage());
+        }
+
+        $chapterStmt->execute([
+            ':course_id'     => $courseId,
+            ':content_title' => $contentTitle,
+            ':filepath'      => $filePath,
+        ]);
+    }
+
+    $pdo->commit();
+    redirectWithFlash('adminList.php', 'success', "Course \"$title\" was created successfully with $chaptersCount chapter(s).");
+
+} catch (PDOException $e) {
+    $pdo->rollBack();
+    deleteFile($imagePath);
+    redirectWithFlash('index.html', 'error', 'Database error: ' . $e->getMessage());
+}
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-   <meta charset="UTF-8">
-   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Create Course</title>
-
-   <!-- font awesome cdn link  -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
-
-   <!-- custom css file link  -->
-   <link rel="stylesheet" href="css\style.css">
-   <style>
-      #description {
-         width: 100%;
-         height: 100%;
-         padding: 10px;
-         font-size: 16px;
-         border: 1px solid #ccc;
-         border-radius: 5px;
-         margin: 10px 0;
-      }
-
-      #credithour {
-         width: 100%;
-         height: 100%;
-         padding: 10px;
-         font-size: 16px;
-         border: 1px solid #ccc;
-         border-radius: 5px;
-         margin: 10px 0;
-      }
-
-      #admin {
-         width: 100%;
-         height: 100%;
-         padding: 10px;
-         font-size: 16px;
-         border: 1px solid #ccc;
-         border-radius: 5px;
-         margin: 10px 0;
-      }
-
-      #title {
-         width: 100%;
-         height: 100%;
-         padding: 10px;
-         font-size: 16px;
-         border: 1px solid #ccc;
-         border-radius: 5px;
-         margin: 10px 0;
-      }
-   </style>
-
-</head>
-
-<body>
-
-   <header class="header">
-
-      <section class="flex">
-
-         <a href="home.php"><img src="images/logo1.png" class="logo"></img></a>
-
-         <!-- <form action="search.php" method="post" class="search-form">
-            <input type="text" name="search_box" required placeholder="search courses..." maxlength="100">
-            <button type="submit" class="fas fa-search"></button>
-         </form> -->
-
-         <div class="icons">
-            <div id="menu-btn" class="fas fa-bars"></div>
-            <div id="search-btn" class="fas fa-search"></div>
-            <div id="user-btn" class="fas fa-user"></div>
-            <div id="toggle-btn" class="fas fa-sun"></div>
-         </div>
-
-         <div class="profile">
-            <img src="images\pic-5.jpg" class="image" alt="">
-            <h3 class="name"><?php echo htmlspecialchars($name); ?></h3>
-            <p class="role">Admin</p>
-            <!-- <a href="profile.php" class="btn">view profile</a> -->
-            <div class="flex-btn">
-               <a href="logout.php" class="option-btn">logout</a>
-               <!-- <a href="register.php" class="option-btn">register</a> -->
-            </div>
-         </div>
-
-      </section>
-
-   </header>
-
-   <div class="side-bar">
-
-      <div id="close-btn">
-         <i class="fas fa-times"></i>
-      </div>
-
-      <div class="profile">
-         <img src="images\pic-5.jpg" class="image" alt="">
-         <h3 class="name"><?php echo htmlspecialchars($name); ?></h3>
-         <p class="role">Admin</p>
-         <!-- <a href="profile.php" class="btn">view profile</a> -->
-      </div>
-
-      <nav class="navbar">
-         <a href="admindashboard.php"><i class="fas fa-home"></i><span>Dashboard</span></a>
-         <a href="CRUD.php"><i class="fas fa-graduation-cap"></i><span>courses</span></a>
-         <a href="learner-info.php"><i class="fas fa-chalkboard-user"></i><span>Learner-Info</span></a>
-      </nav>
-   </div>
-
-   <form method="POST">
-      <section class="playlist-details">
-
-         <h1 class="heading">Course Title</h1>
-         <div class="row">
-            <input type="text" id="title" name="title" placeholder="Enter Course Title">
-         </div>
-      </section>
-
-      <section class="playlist-videos">
-         <h1 class="heading">Course Description </h1>
-         <div class="box-container">
-            <div class="box">
-               <textarea id="description" name="description" placeholder="Enter Course Details..." rows="10"></textarea><br>
-
-               <input type="number" id="credithour" name="credithour" placeholder="Enter Credit Hour"><br><br>
-               <input type="number" id="admin" name="admin" value='<?php echo htmlspecialchars($adminid); ?>'><br><br>
-
-               <button type="submit" name="create" class="inline-btn">Create Course</button>
-            </div>
-         </div>
-      </section>
-   </form>
-
-   <footer class="footer">
-
-      &copy; copyright @ 2024 ALL RIGHTS RESERVED. <span>EduGhar </span>For SKILLS!
-
-   </footer>
-
-   <!-- custom js file link  -->
-   <script src="js/script.js"></script>
-
-
-</body>
-
-</html>
