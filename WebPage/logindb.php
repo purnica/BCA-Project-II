@@ -29,10 +29,10 @@ if($num>0)
     $user = mysqli_fetch_assoc($result);
 
     if($user['password'] === $pass){
-    $_SESSION['id'] = $user['id'];
+    $_SESSION['id'] = $user['learner_id'];
     $_SESSION['firstname'] = $user['firstname'];
     $_SESSION['lastname'] = $user['lastname'];
-    header("Location:home.php");
+    header("Location: ../Learner/home.php");
     exit;
     }
 

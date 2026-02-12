@@ -98,7 +98,7 @@ $name = $_SESSION['name'];
 
       <section class="flex">
 
-         <a href="admindashboard.php"><img src="http://127.0.0.1:5500/Styles/logo1.png" class="logo"></img></a>
+         <a href="learner-info.php"><img src="http://127.0.0.1:5500/Styles/logo1.png" class="logo"></img></a>
 
          <!-- <form action="search.php" method="post" class="search-form">
             <input type="text" name="search_box" required placeholder="search courses..." maxlength="100">
