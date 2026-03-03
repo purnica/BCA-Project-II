@@ -390,6 +390,15 @@ $id   = $_SESSION['id'];
                                 'database'   => 'fa-database',
                                 'security'   => 'fa-shield-alt',
                                 'cloud'      => 'fa-cloud',
+                                'devops'     => 'fa-cogs',
+                                'business'   => 'fa-briefcase',
+                                'marketing'  => 'fa-bullhorn',
+                                'photography' => 'fa-camera',
+                                'psychology' => 'fa-brain',
+                                'time management' => 'fa-clock',
+                                'leadership' => 'fa-user-tie',
+                                'physiotherapy' => 'fa-leaf',
+                                'project management' => 'fa-tasks'
                             ];
                             $icon = 'fa-book';
                             foreach ($icon_map as $keyword => $fa) {
@@ -445,7 +454,7 @@ $id   = $_SESSION['id'];
                         echo '<div class="rec-empty">
                                 <i class="fas fa-compass"></i>
                                 <p>We don\'t have enough info about your interests yet.</p>
-                                <a href="profile.php">Set Your Interests</a>
+                                <a href="update.php">Set Your Interests</a>
                               </div>';
                     } else {
                         // API returned an error

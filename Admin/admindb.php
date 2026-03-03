@@ -30,7 +30,7 @@ if($num>0)
     {
         $_SESSION['name'] = $user['name'];
         $_SESSION['adminid'] = $user['id'];
-        header("Location:admindashboard.php");
+        header("Location:learner-info.php");
         exit;
     }
     else{

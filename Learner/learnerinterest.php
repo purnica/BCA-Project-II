@@ -149,6 +149,16 @@ if(isset($_GET['learner_id'])){
       <input type="checkbox" name="courses[]" value="Digital Marketing">
         Digital Marketing
     </label>
+
+     <label class="pill">
+      <input type="checkbox" name="courses[]" value="Skills Development">
+        Skills Development
+    </label>
+
+     <label class="pill">
+      <input type="checkbox" name="courses[]" value="Other">
+        Other
+    </label>
     
   </div>
 
