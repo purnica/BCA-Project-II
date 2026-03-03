@@ -13,7 +13,6 @@ def get_db_connection():
         cursorclass=pymysql.cursors.DictCursor
     )
 
-
 def fetch_courses():
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -29,7 +28,6 @@ def fetch_courses():
     conn.close()
 
     return pd.DataFrame(data)
-
 
 def fetch_learner_interests(learner_id):
     conn = get_db_connection()
@@ -48,7 +46,6 @@ def fetch_learner_interests(learner_id):
 
     interests = " ".join([row["interests"] for row in data])
     return interests
-
 
 def recommend_courses(learner_id, top_n=5):
 
