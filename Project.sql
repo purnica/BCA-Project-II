@@ -77,10 +77,10 @@ select * from admin;
 
 -- enrollment table
 CREATE TABLE enrollments (
-    enrollment_id  INT          PRIMARY KEY AUTO_INCREMENT,
-    learner_id     INT          NOT NULL,
-    course_id      INT          NOT NULL,
-    enrolled_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    enrollment_id INT PRIMARY KEY AUTO_INCREMENT,
+    learner_id INT NOT NULL,
+    course_id INT NOT NULL,
+    enrolled_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     UNIQUE KEY uq_learner_course (learner_id, course_id),   -- prevents duplicate enrollments at DB level
     FOREIGN KEY (learner_id) REFERENCES learnerlogin(learner_id)    ON DELETE CASCADE,

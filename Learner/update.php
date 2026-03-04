@@ -112,8 +112,11 @@ if ($result->num_rows > 0) {
       <input type="email" name="email" class="box" value="<?php echo $learner['email']; ?>">
       <p>new password</p>
       <input type="password" name="new_pass" class="box" value="<?php echo $learner['password']; ?>">
-
-      <input type="submit" value="update profile" name="submit" class="btn">
+      <p>Update Interests</p>
+      <a class="btn" href="learnerinterest.php?learner_id=<?php echo $id; ?>">
+         Update Interests
+      </a>
+      <input type="submit" value="update profile" name="submit" class="btn" style="background-color: #1a5490">
    </form>
 
 </section>
