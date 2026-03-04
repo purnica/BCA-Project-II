@@ -556,7 +556,7 @@ function getFileType(string $path): string {
 
             <?php if (!empty($course['image'])) : ?>
                 <img
-                    src="<?php echo htmlspecialchars($course['image']); ?>"
+                    src="../admin/<?php echo htmlspecialchars($course['image']); ?>"
                     alt="<?php echo htmlspecialchars($course['title']); ?>"
                     class="course-thumbnail"
                     onerror="this.style.display='none';
@@ -616,7 +616,7 @@ function getFileType(string $path): string {
                     <span class="ch-type-badge type-<?php echo $ftype; ?>">
                         <?php echo $ftype; ?>
                     </span>
-                    <a href="<?php echo htmlspecialchars($ch['filepath']); ?>"
+                    <a href="../admin/<?php echo htmlspecialchars($ch['filepath']); ?>"
                        target="_blank" class="ch-link">Open &nearr;</a>
                 </div>
                 <?php endforeach; ?>

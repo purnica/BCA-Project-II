@@ -456,7 +456,6 @@ $cert_number     = 'EDUGHAR-' . strtoupper(substr(md5($learner_id . $course_id),
                     <img src="http://127.0.0.1:5500/Styles/logo1.png"
                          alt="EduGhar"
                          onerror="this.style.display='none'">
-                    <span>Edu<em>Ghar.</em></span>
                 </div>
 
                 <!-- Certificate heading -->

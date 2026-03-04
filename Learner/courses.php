@@ -366,7 +366,7 @@ $name = $_SESSION['firstname'];
                         <!-- Thumbnail -->
                         <?php if (!empty($image)) : ?>
                             <img
-                                src="<?php echo htmlspecialchars($image); ?>"
+                                src="../admin/<?php echo htmlspecialchars($course['image']); ?>"
                                 alt="<?php echo $title; ?>"
                                 class="card-thumb"
                                 onerror="this.style.display='none';
