@@ -46,7 +46,7 @@ function uploadFile(
     string $destDir,
     string $destUrlPrefix,
     array  $allowedMimes,
-    int    $maxBytes = 104857600   // 100 MB
+    int    $maxBytes = 524288000   // 500 MB
 ): string {
     if ($file['error'] !== UPLOAD_ERR_OK) {
         $errorMessages = [
