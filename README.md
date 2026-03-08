@@ -14,6 +14,27 @@ Admin users can manage the system through a dashboard. They need to login using 
 Learners can interact with the system through their dashboard. They can login, insert their interests, view recommended courses,
 browse all available courses, enroll in courses, view enrolled courses, generate course certificates, and update profile information. 
 
+### Course Recommendation
+
+We have included Machine Learning for course recommendation using Python and flask. It recommends courses to learners based on their interests using the Cosine Similarity algorithm.
+
+#### How it works?
+
+1. Learners select interests during registration.
+
+2. Interests are stored in the learnerinterests table.
+
+3. The ML service compares:
+
+     - learner interests
+
+     - course categories
+
+4. Cosine similarity is calculated between them.
+
+5. Courses with the highest similarity are recommended.
+
+
 ## Project Architecture
 
 ```
