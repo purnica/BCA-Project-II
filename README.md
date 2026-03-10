@@ -78,3 +78,37 @@ We have included Machine Learning for course recommendation using Python and fla
 - Scikit-Learn
 - Cosine Similarity Algorithm
 
+## Installation Guide
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/bca-project-II.git
+```
+
+Move the project inside:
+```bash
+xampp/htdocs/
+```
+
+### 2. Setup Database
+
+Open phpMyAdmin
+
+Create database:
+```bash 
+ project6
+```
+Or, you can also use MySQL Workbench. In this project, I used MySQL workbench for database system.
+
+
+Then, **import the provided SQL tables**.
+
+### 3. Start XAMPP
+
+Start:
+```bash
+Apache
+MySQL
+```
+
