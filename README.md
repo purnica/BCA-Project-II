@@ -93,16 +93,11 @@ xampp/htdocs/
 
 ### 2. Setup Database
 
-Open phpMyAdmin
-
 Create database:
 ```bash 
  project6
 ```
-Or, you can also use MySQL Workbench. In this project, I used MySQL workbench for database system.
-
-
-Then, **import the provided SQL tables**.
+Then, **import the provided SQL tables** from Project.sql file.
 
 ### 3. Start XAMPP
 
@@ -111,4 +106,39 @@ Start:
 Apache
 MySQL
 ```
+
+### 4. Install Python Dependencies
+
+Navigate to the Flask API folder.
+```bash
+cd flask_api
+```
+
+Install required packages one by one.
+```bash
+pip install flask
+pip install scikit-learn
+pip install pandas
+pip install pymysql
+pip install -U flask-cors
+```
+
+### 5. Run the Flask Recommendation API
+
+Firstly, run recommendation.py 
+```bash
+python recommendation.py
+```
+
+Then, run app.py
+```bash
+python app.py
+```
+
+### 6. Open the Website
+```bash
+http://localhost/bca-project-II/webpage
+```
+
+
 
